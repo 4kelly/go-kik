@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/go-cmp/cmp"
-	"github.com/r-kells/go-kik/kiktest"
 	"github.com/r-kells/go-kik/kik"
+	"github.com/r-kells/go-kik/kiktest"
 	"net/http"
 	"strings"
 	"testing"
@@ -33,7 +33,7 @@ func TestGetUser_HappyPath(t *testing.T) {
 	gotUser, err := client.GetUser("Foo")
 
 	if err != nil {
-		t.Errorf("GetUser(%s) returned an error = %s; expected no error", username, err)
+		t.Errorf("GetUser(%s) returned an error = %+v; expected no error", username, err)
 	}
 	if !cmp.Equal(gotUser, expectedUser) {
 		t.Errorf("GetUser(%s) = %v; want %v", username, gotUser, expectedUser)
@@ -47,7 +47,7 @@ func TestGetUser_404(t *testing.T) {
 	_, err := client.GetUser(username)
 
 	// TODO custom error types.
-	if !strings.Contains(fmt.Sprint(err), "status code != OK") {
+	if !strings.Contains(fmt.Sprint(err), "404 page not found") {
 		t.Errorf("Expected 404, got %v", err)
 	}
 }
