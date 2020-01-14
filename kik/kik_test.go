@@ -3,12 +3,13 @@ package kik_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/go-cmp/cmp"
-	"github.com/r-kells/go-kik/kik"
-	"github.com/r-kells/go-kik/kiktest"
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/r-kells/go-kik/kik"
+	"github.com/r-kells/go-kik/kiktest"
 )
 
 // User is an example kik username used for testing, it can be anything.
@@ -26,7 +27,10 @@ func TestGetUser_HappyPath(t *testing.T) {
 	}
 
 	mux.HandleFunc(kik.GetUserUrl, func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(expectedUser)
+		err := json.NewEncoder(w).Encode(expectedUser)
+		if err != nil {
+			panic(err)
+		}
 		fmt.Fprint(w, expectedUser)
 	})
 

@@ -1,12 +1,13 @@
 package integration
 
 import (
-	"github.com/r-kells/go-kik/kik"
 	"log"
 	"net/http"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/r-kells/go-kik/kik"
 )
 
 var (
