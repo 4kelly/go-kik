@@ -3,7 +3,6 @@ package kik
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -17,7 +16,7 @@ func (k *KikClient) do(req *http.Request, v interface{}) (*http.Response, error)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return resp, errors.New(fmt.Sprintf("status code != OK, was %d", resp.StatusCode))
+		return resp, fmt.Errorf("status code != OK, was %d", resp.StatusCode)
 	}
 
 	defer resp.Body.Close()
