@@ -121,12 +121,12 @@ type LinkMessage struct {
 	SendMessage
 	Url string `json:"url"`
 
-	PicUrl    string `json:"picUrl,omitempty"`    // A picture to be displayed in the message.
-	Title     string `json:"title,omitempty"`     // A title to be displayed at the top of the message.
-	Text      string `json:"text,omitempty"`      // Text to be displayed in the middle of the message.
-	NoForward bool   `json:"noForward,omitempty"` //	If true, the message will not be able to be forwarded to other recipients.
-	KikJsData string `json:"kikJsData,omitempty"` //	A JSON payload that would be passed to a website using Kik.js.
-	//Attribution *Attribution `json:"attribution,omitempty"`
+	PicUrl      string       `json:"picUrl,omitempty"`    // A picture to be displayed in the message.
+	Title       string       `json:"title,omitempty"`     // A title to be displayed at the top of the message.
+	Text        string       `json:"text,omitempty"`      // Text to be displayed in the middle of the message.
+	NoForward   bool         `json:"noForward,omitempty"` //	If true, the message will not be able to be forwarded to other recipients.
+	KikJsData   string       `json:"kikJsData,omitempty"` //	A JSON payload that would be passed to a website using Kik.js.
+	Attribution *Attribution `json:"attribution,omitempty"`
 }
 type LinkMessageReceive struct {
 	ReceiveMessage

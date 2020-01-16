@@ -97,6 +97,9 @@ func TestSendMessage_HappyPath(t *testing.T) {
 				Type: "picture",
 			},
 			PicUrl: "https://i.imgur.com/TsoLODG.png",
+			Attribution: &kik.Attribution{
+				Name: "Attribution Test",
+			},
 		},
 		kik.LinkMessage{
 			SendMessage: kik.SendMessage{
@@ -108,6 +111,9 @@ func TestSendMessage_HappyPath(t *testing.T) {
 			Title:     "Link Test",
 			Text:      "Such testing.",
 			NoForward: false,
+			Attribution: &kik.Attribution{
+				Name: "Attribution Test",
+			},
 		},
 		kik.VideoMessage{
 			SendMessage: kik.SendMessage{
@@ -172,6 +178,9 @@ func TestBroadcastMessage_HappyPath(t *testing.T) {
 				Type: "picture",
 			},
 			PicUrl: "https://i.imgur.com/TsoLODG.png",
+			Attribution: &kik.Attribution{
+				Name: "Attribution Test",
+			},
 		},
 		kik.LinkMessage{
 			SendMessage: kik.SendMessage{
@@ -183,6 +192,9 @@ func TestBroadcastMessage_HappyPath(t *testing.T) {
 			Title:     "Link Test",
 			Text:      "Such testing.",
 			NoForward: false,
+			Attribution: &kik.Attribution{
+				Name: "Attribution Test",
+			},
 		},
 		kik.VideoMessage{
 			SendMessage: kik.SendMessage{
