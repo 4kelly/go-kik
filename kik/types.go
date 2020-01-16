@@ -14,14 +14,9 @@ type User struct {
 
 /*
 Keyboard Types
-*/
 
-// Keyboard would be a useful abstraction if this struct is larger or was used independently.
-//type Keyboard struct {
-//	To     string `json:"to,omitempty"`     // defaults to everyone in the conversation.
-//	Hidden bool   `json:"hidden,omitempty"` // defaults to false.
-//	Type   string `json:"type"`
-//}
+Docs for Keyboards: https://dev.kik.com/#/docs/messaging#keyboards
+*/
 
 // SuggestedResponseKeyboard is the only keyboard type, if we add more we can utilize the Keyboard struct.
 type SuggestedResponseKeyboard struct {
@@ -32,34 +27,34 @@ type SuggestedResponseKeyboard struct {
 	Responses []interface{} `json:"responses,omitempty"`
 }
 
-// Response would be a useful abstraction if this struct is larger or was used independently.
-//type Response struct {
-//	Type     string `json:"type"`
-//	Metadata string `json:"metadata,omitempty"`
-//}
-
+// KeyboardTextResponse sets a text message in the keyboard tray.
 type KeyboardTextResponse struct {
-	Type string `json:"type"`
+	Type string `json:"type"` // Type must be "text".
 	Body string `json:"body"`
 
-	Metadata string `json:"metadata,omitempty"`
+	Metadata string `json:"metadata,omitempty"` // Include an object to be returned back to your bot when the user responds using the picture suggested response. This may be a string or object, as needed.
 }
 
+// KeyboardPictureResponse sets a picture in the keyboard tray.
 type KeyboardPictureResponse struct {
-	Type   string `json:"type"`
+	Type   string `json:"type"` // Type must be "picture".
 	PicUrl string `json:"picUrl"`
 
-	Metadata string `json:"metadata,omitempty"`
+	Metadata string `json:"metadata,omitempty"` // Include an object to be returned back to your bot when the user responds using the picture suggested response. This may be a string or object, as needed.
 }
 
+// KeyboardFriendPickerResponse sends a friend picker response to the keyboard tray.
+// It is a special message type that will allow a user to 'invite' their friends to use your bot.
+// When you invoke the friend picker, the user receives a message to invite their friends.
+// It must be set before KeyboardTextResponse.
 type KeyboardFriendPickerResponse struct {
-	Type string `json:"type"`
+	Type string `json:"type"` // Must be "friend-picker".
 
-	Body        string   `json:"body,omitempty"`
-	Min         int8     `json:"min,omitempty"`
-	Max         int8     `json:"max,omitempty"`
-	Preselected []string `json:"preselected,omitempty"`
-	Metadata    string   `json:"metadata,omitempty"`
+	Body        string   `json:"body,omitempty"`        // The text to be shown to the user on the suggested response
+	Min         int8     `json:"min,omitempty"`         // The minimum amount of friends the user can invite, must be between 1 - 100 and less than or equal to max.
+	Max         int8     `json:"max,omitempty"`         // The maximum amount of friends the user can invite, must be between 1 - 100 and greater than or equal to min.
+	Preselected []string `json:"preselected,omitempty"` // A predetermined list of users to be picked by the friend picker.
+	Metadata    string   `json:"metadata,omitempty"`    // Include an object to be returned back to your bot when the user responds using the picture suggested response. This may be a string or object, as needed.
 }
 
 /*
@@ -71,7 +66,7 @@ Messaging Types
 */
 
 type SendMessage struct {
-	To        string                      `json:"to"`
+	To        string                      `json:"to"`                  // The user or group that will receive the message
 	Type      string                      `json:"type"`                // The type of message. See Message Types for the values you can see in this field.
 	Delay     int                         `json:"delay"`               // An interval (in milliseconds) to wait before sending the message.
 	Keyboards []SuggestedResponseKeyboard `json:"keyboards,omitempty"` // SuggestedResponseKeyboard is currently the only valid keyboard type
@@ -85,7 +80,7 @@ type ReceiveMessage struct {
 	From                 string `json:"from"`         // The user who sent the message
 	Type                 string `json:"type"`         // The type of message. See Message Types for the values you can see in this field.
 	Participants         string `json:"participants"` // The type of conversation the message originated from.
-	Timestamp            int    `json:"timestamp"`
+	Timestamp            int    `json:"timestamp"`    // The time the message was sent from the Kik client
 	ReadReceiptRequested bool   `json:"readReceiptRequested"`
 
 	ChatType string `json:"chatType,omitempty"` // The type of conversation the message originated from.
@@ -160,8 +155,45 @@ type VideoMessageReceive struct {
 }
 
 /*
+Configuration
+*/
+
+type Configuration struct {
+	Webhook   string            `json:"webhook"` // A URL to a webhook to which calls will be made when users interact with your bot.
+	*Features `json:"features"` // An object describing the features that are active or not active for your bot.
+
+	StaticKeyboard *SuggestedResponseKeyboard `json:"staticKeyboard,omitempty"` // A keyboard object that shows when a user starts to mention your bot in a conversation.
+}
+
+type Features struct {
+	ManuallySendReadReceipts bool `json:"manuallySendReadReceipts"` // If enabled, your bot will be responsible for sending its own read receipts to users when you receive messages.
+	ReceiveReadReceipts      bool `json:"receiveReadReceipts"`      // If enabled, your bot will receive messages of type read-receipt messages from users.
+	ReceiveDeliveryReceipts  bool `json:"receiveDeliveryReceipts"`  // If enabled, your bot will receive messages of type delivery-receipt messages from users.
+	ReceiveIsTyping          bool `json:"receiveIsTyping"`          // If enabled, your bot will receive messages of type is-typing messages from users.
+}
+
+/*
 Error Types
 */
 
 var NotMessageTypeError = errors.New("not a valid message type")
 var HttpError = errors.New("HTTP request did not return 200")
+
+/*
+Notes
+*/
+
+// Response would be a useful abstraction if this struct is larger or was used independently.
+// Instead just embed the raw types for each response.
+//type Response struct {
+//	Type     string `json:"type"`
+//	Metadata string `json:"metadata,omitempty"`
+//}
+
+// Keyboard would be a useful abstraction if this struct is larger or was used independently.
+// Instead just embed the raw types for each keyboard.
+//type Keyboard struct {
+//	To     string `json:"to,omitempty"`     // defaults to everyone in the conversation.
+//	Hidden bool   `json:"hidden,omitempty"` // defaults to false.
+//	Type   string `json:"type"`
+//}

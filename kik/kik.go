@@ -1,4 +1,5 @@
 // go-kik is a client library for the [kik bot api](https://dev.kik.com/#/home).
+// Documentation can be found [here](https://dev.kik.com/#/docs/messaging).
 package kik
 
 import (
@@ -12,6 +13,7 @@ const (
 	GetUserUrl     = "/v1/user/"
 	SendMessageUrl = "/v1/message"
 	BroadcastUrl   = "/v1/broadcast"
+	ConfigtUrl     = "/v1/config"
 )
 
 // Client is used to interface with the Kik bot API.
@@ -43,13 +45,38 @@ func NewKikClient(baseUrl string, botUsername string, apiKey string, httpClient 
 		BaseUrl:     baseUrlParsed}, nil
 }
 
-//func (k *Client) setConfiguration() (http.Client, error) {
-//	return apiResponse{}
-//}
-//
-//func (k *Client) getConfiguration() (http.Client, error) {
-//	return apiResponse{}
-//}
+func (k *Client) SetConfiguration(c *Configuration) error {
+	req, err := k.newRequest("POST", ConfigtUrl, c)
+	if err != nil {
+		return err
+	}
+
+	req.SetBasicAuth(k.BotUsername, k.ApiKey)
+
+	err = k.do(req, &c)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (k *Client) GetConfiguration() (*Configuration, error) {
+	var config Configuration
+
+	req, err := k.newRequest("GET", ConfigtUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetBasicAuth(k.BotUsername, k.ApiKey)
+
+	err = k.do(req, &config)
+	if err != nil {
+		return nil, err
+	}
+	return &config, nil
+}
+
 func (k *Client) SendMessage(messages []interface{}) error {
 	err := validateMessageTypes(messages)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/r-kells/go-kik/kik"
 )
 
@@ -56,10 +57,25 @@ func TestGetUser_HappyPath(t *testing.T) {
 	}
 }
 
+// TestSendMessage_HappyPath will only fail if there is an error in the payloads being sent.
+// This is useful to verify the Kik API hasn't introduced breaking request / response types.
 func TestSendMessage_HappyPath(t *testing.T) {
+	// Contains an example of all the keyboar response types.
 	keyboard := []kik.SuggestedResponseKeyboard{
 		{Type: "suggested",
 			Responses: []interface{}{
+				kik.KeyboardPictureResponse{
+					Type:     "picture",
+					PicUrl:   "https://i.imgur.com/8rqLdgy.png",
+					Metadata: "picture1",
+				},
+				kik.KeyboardFriendPickerResponse{
+					Type:        "friend-picker",
+					Body:        "Test",
+					Min:         0,
+					Max:         2,
+					Preselected: []string{"cacolvil"},
+				},
 				kik.KeyboardTextResponse{
 					Type: "text",
 					Body: "KeyboardTextResponse",
@@ -119,9 +135,22 @@ func TestSendMessage_HappyPath(t *testing.T) {
 
 func TestBroadcastMessage_HappyPath(t *testing.T) {
 
+	// Contains an example of all the keyboar response types.
 	keyboard := []kik.SuggestedResponseKeyboard{
 		{Type: "suggested",
 			Responses: []interface{}{
+				kik.KeyboardPictureResponse{
+					Type:     "picture",
+					PicUrl:   "https://i.imgur.com/8rqLdgy.png",
+					Metadata: "picture1",
+				},
+				kik.KeyboardFriendPickerResponse{
+					Type:        "friend-picker",
+					Body:        "Test",
+					Min:         0,
+					Max:         2,
+					Preselected: []string{"cacolvil"},
+				},
 				kik.KeyboardTextResponse{
 					Type: "text",
 					Body: "KeyboardTextResponse",
@@ -176,4 +205,40 @@ func TestBroadcastMessage_HappyPath(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while trying to broadcast a message. %v.", err)
 	}
+}
+
+// TestConfig_HappyPath Sets then gets Kik bot configuration.
+func TestConfig_HappyPath(t *testing.T) {
+	keyboard := &kik.SuggestedResponseKeyboard{
+		Type: "suggested",
+		Responses: []interface{}{
+			kik.KeyboardTextResponse{
+				Type: "text",
+				Body: "StaticKeyboardTest",
+			},
+		},
+	}
+	wantConfig := &kik.Configuration{
+		Webhook: "http://example.com",
+		Features: &kik.Features{
+			ManuallySendReadReceipts: true,
+			ReceiveReadReceipts:      true,
+			ReceiveDeliveryReceipts:  true,
+			ReceiveIsTyping:          true,
+		},
+		StaticKeyboard: keyboard,
+	}
+	err := kikClient.SetConfiguration(wantConfig)
+	if err != nil {
+		t.Errorf("Error while trying to set configuration. %v.", err)
+	}
+	gotConfig, err := kikClient.GetConfiguration()
+	if err != nil {
+		t.Errorf("Error while trying to get configuration. %v.", err)
+	}
+
+	if !cmp.Equal(gotConfig, wantConfig) {
+		t.Errorf("SetConfiguration() = %v; want %v", gotConfig, wantConfig)
+	}
+
 }
