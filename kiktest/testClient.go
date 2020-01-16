@@ -11,7 +11,7 @@ import (
 // TestClient is a helper that creates a mocked Kik API.
 // To mock behaviour of the Kik API, simply add routes to the `mux` in your tests.
 // See [../kik_test.go](../kikbot_test.go).
-func TestClient(t *testing.T) (*kik.KikClient, *http.ServeMux, func()) {
+func TestClient(t *testing.T) (*kik.Client, *http.ServeMux, func()) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 	c, err := kik.NewKikClient(

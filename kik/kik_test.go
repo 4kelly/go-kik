@@ -3,12 +3,13 @@ package kik_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/go-cmp/cmp"
-	"github.com/r-kells/go-kik/kiktest"
-	"github.com/r-kells/go-kik/kik"
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/r-kells/go-kik/kik"
+	"github.com/r-kells/go-kik/kiktest"
 )
 
 // User is an example kik username used for testing, it can be anything.
@@ -26,14 +27,17 @@ func TestGetUser_HappyPath(t *testing.T) {
 	}
 
 	mux.HandleFunc(kik.GetUserUrl, func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(expectedUser)
+		err := json.NewEncoder(w).Encode(expectedUser)
+		if err != nil {
+			panic(err)
+		}
 		fmt.Fprint(w, expectedUser)
 	})
 
 	gotUser, err := client.GetUser("Foo")
 
 	if err != nil {
-		t.Errorf("GetUser(%s) returned an error = %s; expected no error", username, err)
+		t.Errorf("GetUser(%s) returned an error = %+v; expected no error", username, err)
 	}
 	if !cmp.Equal(gotUser, expectedUser) {
 		t.Errorf("GetUser(%s) = %v; want %v", username, gotUser, expectedUser)
@@ -47,7 +51,7 @@ func TestGetUser_404(t *testing.T) {
 	_, err := client.GetUser(username)
 
 	// TODO custom error types.
-	if !strings.Contains(fmt.Sprint(err), "status code != OK") {
+	if !strings.Contains(fmt.Sprint(err), "404 page not found") {
 		t.Errorf("Expected 404, got %v", err)
 	}
 }
