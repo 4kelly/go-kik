@@ -141,7 +141,7 @@ func TestSendMessage_HappyPath(t *testing.T) {
 
 func TestBroadcastMessage_HappyPath(t *testing.T) {
 
-	// Contains an example of all the keyboar response types.
+	// Contains an example of all the keyboard response types.
 	keyboard := []kik.SuggestedResponseKeyboard{
 		{Type: "suggested",
 			Responses: []interface{}{
