@@ -173,6 +173,24 @@ type Features struct {
 }
 
 /*
+Kik Codes
+
+Kik codes are a type of 2D barcode similar to QR codes that users can scan.
+To render an image of your Kik Code, go to https://api.kik.com/v1/code/<id>?c=<color-code>.
+The request will return a 1024x1024 PNG-encoded image.
+
+Docs for Kik Codes: https://dev.kik.com/#/docs/messaging#kik-codes-api
+*/
+
+type ScanData struct {
+	Data string `json:"data"` // Will be embedded in the Kik Code that users can scan.
+}
+
+type Code struct {
+	Id string `json:"id"` // The ID to reference a generated Kik code.
+}
+
+/*
 Error Types
 */
 

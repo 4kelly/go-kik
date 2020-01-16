@@ -137,8 +137,6 @@ func (k *Client) GetUser(username string) (*User, error) {
 	return &user, nil
 }
 
-//
-//func (k *Client) createCode() (http.Client, error) {
-//	return apiResponse{}
-//}
-//
+func (k *Client) createCode() (Code, error) {
+	
+}
