@@ -3,6 +3,9 @@
 package kik
 
 import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -152,7 +155,15 @@ func (k *Client) CreateCode(s *ScanData) (*Code, error) {
 	return &code, nil
 }
 
-// TODO implement VerifySignature
+// VerifySignature verifies that a request body correctly matches the header signature.
+// For more on signatures see the [docs](https://dev.kik.com/#/docs/messaging#receiving-messages).
 func (k *Client) VerifySignature(signature string, body []byte) bool {
-	return true
+	return signature == computeHmac1(body, k.ApiKey)
+}
+
+func computeHmac1(message []byte, secret string) string {
+	key := []byte(secret)
+	h := hmac.New(sha1.New, key)
+	h.Write(message)
+	return hex.EncodeToString(h.Sum(nil))
 }

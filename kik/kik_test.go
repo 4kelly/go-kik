@@ -75,3 +75,27 @@ func TestGetUser_ShouldFailToDecodeUser(t *testing.T) {
 		t.Errorf("Expected a json decode error, got %v", err)
 	}
 }
+
+// TODO: can't verify this is working yet, seems like something on Kik side.
+// func TestVerifySignature_Valid(t *testing.T) {
+// 	client, _, teardown := kiktest.TestClient(t)
+// 	defer teardown()
+
+// 	got := client.VerifySignature("AC18D0105C2C257652859322B0499313342C6EB9", []byte("body"))
+// 	want := true
+
+// 	if got != want {
+// 		t.Errorf("Expected signature validation to be correct.")
+// 	}
+// }
+
+func TestVerifySignature_Invalid(t *testing.T) {
+	client, _, teardown := kiktest.TestClient(t)
+	defer teardown()
+	got := client.VerifySignature("invalid sig", []byte("body"))
+	want := false
+
+	if got != want {
+		t.Errorf("Expected signature validation to fail.")
+	}
+}
