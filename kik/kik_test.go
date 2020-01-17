@@ -58,6 +58,7 @@ func TestGetUser_404(t *testing.T) {
 
 // This really testing the helper methods.
 // Should drop this after explicitly adding tests for helpers.
+// TODO maybe this test should validate the errors passed to the user of this library.
 func TestGetUser_ShouldFailToDecodeUser(t *testing.T) {
 	client, mux, teardown := kiktest.TestClient(t)
 	defer teardown()

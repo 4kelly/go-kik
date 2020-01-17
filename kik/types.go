@@ -24,6 +24,7 @@ type SuggestedResponseKeyboard struct {
 	Hidden bool   `json:"hidden,omitempty"` // defaults to false.
 	Type   string `json:"type"`             // must be "suggested"
 	// Must be one of *Response structs. Validated at runtime due to lack of generics.
+	// TODO actually validate
 	Responses []interface{} `json:"responses,omitempty"`
 }
 
