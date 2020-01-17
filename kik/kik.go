@@ -62,7 +62,6 @@ func (k *Client) SetConfiguration(c *Configuration) error {
 }
 
 func (k *Client) GetConfiguration() (*Configuration, error) {
-
 	req, err := k.newRequest("GET", ConfigtUrl, nil)
 	if err != nil {
 		return nil, err
@@ -122,7 +121,6 @@ func (k *Client) BroadcastMessage(messages []interface{}) error {
 
 // GetUser returns a users profile data as a User struct.
 func (k *Client) GetUser(username string) (*User, error) {
-
 	req, err := k.newRequest("GET", GetUserUrl+username, nil)
 	if err != nil {
 		return nil, err
@@ -147,7 +145,6 @@ func (k *Client) CreateCode(s *ScanData) (*Code, error) {
 	req.SetBasicAuth(k.BotUsername, k.ApiKey)
 
 	var code Code
-
 	err = k.do(req, &code)
 	if err != nil {
 		return nil, err
