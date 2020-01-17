@@ -151,3 +151,8 @@ func (k *Client) CreateCode(s *ScanData) (*Code, error) {
 	}
 	return &code, nil
 }
+
+// TODO implement VerifySignature
+func (k *Client) VerifySignature(signature string, body []byte) bool {
+	return true
+}
