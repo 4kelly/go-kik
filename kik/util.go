@@ -72,11 +72,12 @@ func (k *Client) newRequest(method, urlStr string, body interface{}) (*http.Requ
 // conform to valid message types. This is the best alternative without generics.
 func validateMessageTypes(typesToTest []interface{}) error {
 	for _, t := range typesToTest {
-		switch _t := t.(type) {
+
+		switch messageType := t.(type) {
 		case TextMessage, PictureMessage, LinkMessage, VideoMessage:
 			continue
 		default:
-			return fmt.Errorf("type: %T value:%v %w", _t, t, NotMessageTypeError)
+			return fmt.Errorf("type: %T value:%v %w", messageType, t, NotMessageTypeError)
 		}
 	}
 	return nil

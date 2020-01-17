@@ -1,4 +1,4 @@
-// go-kik is a client library for the [kik bot api](https://dev.kik.com/#/home).
+// Package kik is a client library for the [kik bot api](https://dev.kik.com/#/home).
 // Documentation can be found [here](https://dev.kik.com/#/docs/messaging).
 package kik
 
@@ -14,6 +14,7 @@ const (
 	SendMessageUrl = "/v1/message"
 	BroadcastUrl   = "/v1/broadcast"
 	ConfigtUrl     = "/v1/config"
+	CodetUrl       = "/v1/code"
 )
 
 // Client is used to interface with the Kik bot API.
@@ -61,8 +62,6 @@ func (k *Client) SetConfiguration(c *Configuration) error {
 }
 
 func (k *Client) GetConfiguration() (*Configuration, error) {
-	var config Configuration
-
 	req, err := k.newRequest("GET", ConfigtUrl, nil)
 	if err != nil {
 		return nil, err
@@ -70,6 +69,7 @@ func (k *Client) GetConfiguration() (*Configuration, error) {
 
 	req.SetBasicAuth(k.BotUsername, k.ApiKey)
 
+	var config Configuration
 	err = k.do(req, &config)
 	if err != nil {
 		return nil, err
@@ -121,8 +121,6 @@ func (k *Client) BroadcastMessage(messages []interface{}) error {
 
 // GetUser returns a users profile data as a User struct.
 func (k *Client) GetUser(username string) (*User, error) {
-	var user User
-
 	req, err := k.newRequest("GET", GetUserUrl+username, nil)
 	if err != nil {
 		return nil, err
@@ -130,6 +128,7 @@ func (k *Client) GetUser(username string) (*User, error) {
 
 	req.SetBasicAuth(k.BotUsername, k.ApiKey)
 
+	var user User
 	err = k.do(req, &user)
 	if err != nil {
 		return nil, err
@@ -137,8 +136,18 @@ func (k *Client) GetUser(username string) (*User, error) {
 	return &user, nil
 }
 
-//
-//func (k *Client) createCode() (http.Client, error) {
-//	return apiResponse{}
-//}
-//
+func (k *Client) CreateCode(s *ScanData) (*Code, error) {
+	req, err := k.newRequest("POST", CodetUrl, s)
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetBasicAuth(k.BotUsername, k.ApiKey)
+
+	var code Code
+	err = k.do(req, &code)
+	if err != nil {
+		return nil, err
+	}
+	return &code, nil
+}
