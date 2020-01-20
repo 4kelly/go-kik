@@ -1,6 +1,7 @@
 package kik
 
 import (
+	"encoding/json"
 	"errors"
 )
 
@@ -20,16 +21,29 @@ Docs for Keyboards: https://dev.kik.com/#/docs/messaging#keyboards
 
 // SuggestedResponseKeyboard is the only keyboard type, if we add more we can utilize the Keyboard struct.
 type SuggestedResponseKeyboard struct {
-	To     string `json:"to,omitempty"`     // defaults to everyone in the conversation.
-	Hidden bool   `json:"hidden,omitempty"` // defaults to false.
-	Type   string `json:"type"`             // must be "suggested"
-	// Must be one of *Response structs. Validated at runtime due to lack of generics.
-	// TODO actually validate
-	Responses []interface{} `json:"responses,omitempty"`
+	To        string              `json:"to,omitempty"`     // defaults to everyone in the conversation.
+	Hidden    bool                `json:"hidden,omitempty"` // defaults to false.
+	Type      string              `json:"type"`             // must be "suggested"
+	Responses []ResponseInterface `json:"responses,omitempty"`
+}
+
+type ResponseInterface interface {
+	marshalJSON() ([]byte, error)
+	unMarshalJSON([]byte) error
+}
+type Response struct{}
+
+func (t Response) marshalJSON() ([]byte, error) {
+	return json.Marshal(t)
+}
+
+func (t Response) unMarshalJSON(data []byte) error {
+	return json.Unmarshal(data, &t)
 }
 
 // KeyboardTextResponse sets a text message in the keyboard tray.
 type KeyboardTextResponse struct {
+	Response
 	Type string `json:"type"` // Type must be "text".
 	Body string `json:"body"`
 
@@ -38,6 +52,7 @@ type KeyboardTextResponse struct {
 
 // KeyboardPictureResponse sets a picture in the keyboard tray.
 type KeyboardPictureResponse struct {
+	Response
 	Type   string `json:"type"` // Type must be "picture".
 	PicUrl string `json:"picUrl"`
 
@@ -49,6 +64,7 @@ type KeyboardPictureResponse struct {
 // When you invoke the friend picker, the user receives a message to invite their friends.
 // It must be set before KeyboardTextResponse.
 type KeyboardFriendPickerResponse struct {
+	Response
 	Type string `json:"type"` // Must be "friend-picker".
 
 	Body        string   `json:"body,omitempty"`        // The text to be shown to the user on the suggested response
@@ -65,6 +81,9 @@ Messaging Types
 2. Receive (from users to the bot).
 
 */
+type Message interface {
+	marshalJSON() ([]byte, error)
+}
 
 type SendMessage struct {
 	To        string                      `json:"to"`                  // The user or group that will receive the message
@@ -73,6 +92,10 @@ type SendMessage struct {
 	Keyboards []SuggestedResponseKeyboard `json:"keyboards,omitempty"` // SuggestedResponseKeyboard is currently the only valid keyboard type
 	Id        string                      `json:"id,omitempty"`        // randomUUID() ID for this message.Use this to link messages to receipts.This will always be present for received messages.
 	ChatId    string                      `json:"chatId,omitempty"`    // The identifier for the conversation your bot is involved in. This field is recommended for all responses in order for messages to be routed correctly (for example, if you're messaging a user in a group)
+}
+
+func (t SendMessage) marshalJSON() ([]byte, error) {
+	return json.Marshal(t)
 }
 
 type ReceiveMessage struct {

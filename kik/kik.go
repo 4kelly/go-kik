@@ -17,7 +17,7 @@ const (
 	SendMessageUrl = "/v1/message"
 	BroadcastUrl   = "/v1/broadcast"
 	ConfigtUrl     = "/v1/config"
-	CodetUrl       = "/v1/code"
+	CodeUrl        = "/v1/code"
 )
 
 // Client is used to interface with the Kik bot API.
@@ -80,14 +80,9 @@ func (k *Client) GetConfiguration() (*Configuration, error) {
 	return &config, nil
 }
 
-func (k *Client) SendMessage(messages []interface{}) error {
-	err := validateMessageTypes(messages)
-	if err != nil {
-		return err
-	}
-
+func (k *Client) SendMessage(messages []Message) error {
 	type m struct {
-		Messages []interface{} `json:"messages"`
+		Messages []Message `json:"messages"`
 	}
 	payload := m{Messages: messages}
 
@@ -101,14 +96,9 @@ func (k *Client) SendMessage(messages []interface{}) error {
 	return k.do(req, nil)
 }
 
-func (k *Client) BroadcastMessage(messages []interface{}) error {
-	err := validateMessageTypes(messages)
-	if err != nil {
-		return err
-	}
-
+func (k *Client) BroadcastMessage(messages []Message) error {
 	type m struct {
-		Messages []interface{} `json:"messages"`
+		Messages []Message `json:"messages"`
 	}
 	payload := m{Messages: messages}
 
@@ -140,7 +130,7 @@ func (k *Client) GetUser(username string) (*User, error) {
 }
 
 func (k *Client) CreateCode(s *ScanData) (*Code, error) {
-	req, err := k.newRequest("POST", CodetUrl, s)
+	req, err := k.newRequest("POST", CodeUrl, s)
 	if err != nil {
 		return nil, err
 	}

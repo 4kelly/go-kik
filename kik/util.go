@@ -17,6 +17,10 @@ func (k *Client) do(req *http.Request, v interface{}) error {
 		return err
 	}
 
+	// defer resp.Body.Close()
+	// b, _ := ioutil.ReadAll(resp.Body)
+	// fmt.Printf("WTF %s END", string(b))
+
 	if resp.StatusCode != http.StatusOK {
 		defer resp.Body.Close()
 		b, _ := ioutil.ReadAll(resp.Body)
@@ -28,7 +32,7 @@ func (k *Client) do(req *http.Request, v interface{}) error {
 		defer resp.Body.Close()
 
 		if err = json.NewDecoder(resp.Body).Decode(v); err != nil {
-			return fmt.Errorf("error trying to decode json into `v` struct: %v", err)
+			return fmt.Errorf("error trying to decode json into struct: %v", err)
 		}
 	}
 	return nil
@@ -66,19 +70,4 @@ func (k *Client) newRequest(method, urlStr string, body interface{}) (*http.Requ
 		req.Header.Set("Content-Type", "application/json")
 	}
 	return req, nil
-}
-
-// validateMessageTypes ensures that the message interfaces that are passed
-// conform to valid message types. This is the best alternative without generics.
-func validateMessageTypes(typesToTest []interface{}) error {
-	for _, t := range typesToTest {
-
-		switch messageType := t.(type) {
-		case TextMessage, PictureMessage, LinkMessage, VideoMessage:
-			continue
-		default:
-			return fmt.Errorf("type: %T value:%v %w", messageType, t, NotMessageTypeError)
-		}
-	}
-	return nil
 }
