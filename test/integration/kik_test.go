@@ -58,21 +58,21 @@ func TestGetUser_HappyPath(t *testing.T) {
 	}
 }
 
-// func TestSendMessage_HappyPath(t *testing.T) {
+func TestSendMessage_HappyPath(t *testing.T) {
 
-// 	err := kikClient.SendMessage(allMessageTypesTestData)
-// 	if err != nil {
-// 		t.Errorf("Error while trying to send a message. %v.", err)
-// 	}
-// }
+	err := kikClient.SendMessage(allMessageTypesTestData)
+	if err != nil {
+		t.Errorf("Error while trying to send a message. %v.", err)
+	}
+}
 
-// func TestBroadcastMessage_HappyPath(t *testing.T) {
+func TestBroadcastMessage_HappyPath(t *testing.T) {
 
-// 	err := kikClient.BroadcastMessage(allMessageTypesTestData)
-// 	if err != nil {
-// 		t.Errorf("Error while trying to broadcast a message. %v.", err)
-// 	}
-// }
+	err := kikClient.BroadcastMessage(allMessageTypesTestData)
+	if err != nil {
+		t.Errorf("Error while trying to broadcast a message. %v.", err)
+	}
+}
 
 // TestConfig_HappyPath Sets then gets Kik bot configuration.
 func TestConfig_HappyPath(t *testing.T) {
