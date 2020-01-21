@@ -88,10 +88,10 @@ func TestConfig_HappyPath(t *testing.T) {
 	wantConfig := &kik.Configuration{
 		Webhook: "http://example.com",
 		Features: &kik.Features{
-			ManuallySendReadReceipts: true,
-			ReceiveReadReceipts:      true,
-			ReceiveDeliveryReceipts:  true,
-			ReceiveIsTyping:          true,
+			ManuallySendReadReceipts: false,
+			ReceiveReadReceipts:      false,
+			ReceiveDeliveryReceipts:  false,
+			ReceiveIsTyping:          false,
 		},
 		StaticKeyboard: keyboard,
 	}
@@ -167,7 +167,7 @@ var allKeyboardTypesTestData = []kik.SuggestedResponseKeyboard{
 }
 
 // Contains an example of all the message types
-var allMessageTypesTestData = []interface{}{
+var allMessageTypesTestData = []kik.Message{
 	kik.TextMessage{
 		SendMessage: kik.SendMessage{
 			To:   testUserName,
@@ -203,7 +203,7 @@ var allMessageTypesTestData = []interface{}{
 		SendMessage: kik.SendMessage{
 			To:        testUserName,
 			Type:      "video",
-			Delay:     1,
+			Delay:     500,
 			Keyboards: allKeyboardTypesTestData,
 		},
 		VideoUrl: "https://media.tenor.com/videos/a912c20be335cfd78610916c97198438/mp4",

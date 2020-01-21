@@ -1,6 +1,7 @@
 package kik
 
 import (
+	"encoding/json"
 	"errors"
 )
 
@@ -20,11 +21,12 @@ Docs for Keyboards: https://dev.kik.com/#/docs/messaging#keyboards
 
 // SuggestedResponseKeyboard is the only keyboard type, if we add more we can utilize the Keyboard struct.
 type SuggestedResponseKeyboard struct {
+	Type string `json:"type"` // must be "suggested"
+
 	To     string `json:"to,omitempty"`     // defaults to everyone in the conversation.
 	Hidden bool   `json:"hidden,omitempty"` // defaults to false.
-	Type   string `json:"type"`             // must be "suggested"
-	// Must be one of *Response structs. Validated at runtime due to lack of generics.
-	// TODO actually validate
+
+	// TODO: actually validate.
 	Responses []interface{} `json:"responses,omitempty"`
 }
 
@@ -66,6 +68,19 @@ Messaging Types
 
 */
 
+// Messages is a simple wrapper around a `Message` interface to satisfy the formatting for the Kik API payload.
+type Messages struct {
+	Messages []Message `json:"messages"`
+}
+
+// Message is a dummy interface so that all structs that embedd `Message` share a common interface.
+type Message interface {
+	message()
+}
+
+// Implement the dummy interface
+func (t SendMessage) message() { return }
+
 type SendMessage struct {
 	To        string                      `json:"to"`                  // The user or group that will receive the message
 	Type      string                      `json:"type"`                // The type of message. See Message Types for the values you can see in this field.
@@ -75,14 +90,67 @@ type SendMessage struct {
 	ChatId    string                      `json:"chatId,omitempty"`    // The identifier for the conversation your bot is involved in. This field is recommended for all responses in order for messages to be routed correctly (for example, if you're messaging a user in a group)
 }
 
+// ReceivedMessages is a simple wrapper around a `Receive` interface
+// that knows how to Unmarshal the JSON returned from the Kik API into a valid struct Type.
+type ReceivedMessages []Receive
+
+// UnmarshalJSON knows how to parse Kik bot API responses into their correct types.
+func (v *ReceivedMessages) UnmarshalJSON(data []byte) error {
+	// This just splits up the JSON array into the raw JSON for each object
+	var raw map[string][]json.RawMessage
+	err := json.Unmarshal(data, &raw)
+	if err != nil {
+		return err
+	}
+
+	messages := raw["messages"]
+	for _, r := range messages {
+		// unamrshal into a map to check the "type" field
+		var obj map[string]interface{}
+		err := json.Unmarshal(r, &obj)
+		if err != nil {
+			return err
+		}
+
+		messageType := ""
+		if t, ok := obj["type"].(string); ok {
+			messageType = t
+		}
+
+		// unmarshal again into the correct type
+		var actual Receive
+		switch messageType {
+		case "text":
+			actual = &TextMessageReceive{}
+		case "picture":
+			actual = &PictureMessageReceive{}
+		}
+
+		err = json.Unmarshal(r, actual)
+		if err != nil {
+			return err
+		}
+		*v = append(*v, actual)
+	}
+	return nil
+}
+
+// Receive is a dummy interface so that all structs that embedd `Receive` share a common interface.
+type Receive interface {
+	receive()
+}
+
+// Implements dummy interface.
+func (t ReceiveMessage) receive() { return }
+
 type ReceiveMessage struct {
-	ChatId               string `json:"chatId"`       // The identifier for the conversation your bot is involved in. This field is recommended for all responses in order for messages to be routed correctly (for example, if you're messaging a user in a group)
-	Id                   string `json:"id"`           // randomUUID() ID for this message.Use this to link messages to receipts.This will always be present for received messages.
-	From                 string `json:"from"`         // The user who sent the message
-	Type                 string `json:"type"`         // The type of message. See Message Types for the values you can see in this field.
-	Participants         string `json:"participants"` // The type of conversation the message originated from.
-	Timestamp            int    `json:"timestamp"`    // The time the message was sent from the Kik client
-	ReadReceiptRequested bool   `json:"readReceiptRequested"`
+	ChatId               string   `json:"chatId"`       // The identifier for the conversation your bot is involved in. This field is recommended for all responses in order for messages to be routed correctly (for example, if you're messaging a user in a group)
+	Id                   string   `json:"id"`           // randomUUID() ID for this message.Use this to link messages to receipts.This will always be present for received messages.
+	From                 string   `json:"from"`         // The user who sent the message
+	Type                 string   `json:"type"`         // The type of message. See Message Types for the values you can see in this field.
+	Participants         []string `json:"participants"` // The type of conversation the message originated from.
+	Timestamp            int      `json:"timestamp"`    // The time the message was sent from the Kik client
+	ReadReceiptRequested bool     `json:"readReceiptRequested"`
 
 	ChatType string `json:"chatType,omitempty"` // The type of conversation the message originated from.
 	Mention  string `json:"mention,omitempty"`  // The username of the bot mentioned in the message.
@@ -197,22 +265,3 @@ Error Types
 
 var NotMessageTypeError = errors.New("not a valid message type")
 var HttpError = errors.New("HTTP request did not return 200")
-
-/*
-Notes
-*/
-
-// Response would be a useful abstraction if this struct is larger or was used independently.
-// Instead just embed the raw types for each response.
-//type Response struct {
-//	Type     string `json:"type"`
-//	Metadata string `json:"metadata,omitempty"`
-//}
-
-// Keyboard would be a useful abstraction if this struct is larger or was used independently.
-// Instead just embed the raw types for each keyboard.
-//type Keyboard struct {
-//	To     string `json:"to,omitempty"`     // defaults to everyone in the conversation.
-//	Hidden bool   `json:"hidden,omitempty"` // defaults to false.
-//	Type   string `json:"type"`
-//}
