@@ -4,7 +4,6 @@
 package integration
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -80,7 +79,7 @@ func TestConfig_HappyPath(t *testing.T) {
 	keyboard := &kik.SuggestedResponseKeyboard{
 		Type: "suggested",
 		Responses: []interface{}{
-			&kik.KeyboardTextResponse{
+			kik.KeyboardTextResponse{
 				Type: "text",
 				Body: "StaticKeyboardTest",
 			},
@@ -104,9 +103,6 @@ func TestConfig_HappyPath(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error while trying to get configuration. %v.", err)
 	}
-
-	s, _ := json.Marshal(gotConfig)
-	fmt.Printf("\nreturned configuration: %s\n\n", string(s))
 
 	if !cmp.Equal(gotConfig, wantConfig) {
 		t.Errorf("SetConfiguration() = %v; want %v", gotConfig, wantConfig)
@@ -150,19 +146,19 @@ var testUserName = "rmdkelly"
 var allKeyboardTypesTestData = []kik.SuggestedResponseKeyboard{
 	{Type: "suggested",
 		Responses: []interface{}{
-			&kik.KeyboardPictureResponse{
+			kik.KeyboardPictureResponse{
 				Type:     "picture",
 				PicUrl:   "https://i.imgur.com/8rqLdgy.png",
 				Metadata: "picture1",
 			},
-			&kik.KeyboardFriendPickerResponse{
+			kik.KeyboardFriendPickerResponse{
 				Type:        "friend-picker",
 				Body:        "Test",
 				Min:         0,
 				Max:         2,
 				Preselected: []string{"cacolvil"},
 			},
-			&kik.KeyboardTextResponse{
+			kik.KeyboardTextResponse{
 				Type: "text",
 				Body: "KeyboardTextResponse",
 			},

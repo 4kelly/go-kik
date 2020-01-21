@@ -17,10 +17,6 @@ func (k *Client) do(req *http.Request, v interface{}) error {
 		return err
 	}
 
-	// defer resp.Body.Close()
-	// b, _ := ioutil.ReadAll(resp.Body)
-	// fmt.Printf("WTF %s END", string(b))
-
 	if resp.StatusCode != http.StatusOK {
 		defer resp.Body.Close()
 		b, _ := ioutil.ReadAll(resp.Body)

@@ -23,8 +23,10 @@ Docs for Keyboards: https://dev.kik.com/#/docs/messaging#keyboards
 type SuggestedResponseKeyboard struct {
 	Type string `json:"type"` // must be "suggested"
 
-	To        string        `json:"to,omitempty"`     // defaults to everyone in the conversation.
-	Hidden    bool          `json:"hidden,omitempty"` // defaults to false.
+	To     string `json:"to,omitempty"`     // defaults to everyone in the conversation.
+	Hidden bool   `json:"hidden,omitempty"` // defaults to false.
+
+	// TODO: actually validate.
 	Responses []interface{} `json:"responses,omitempty"`
 }
 
