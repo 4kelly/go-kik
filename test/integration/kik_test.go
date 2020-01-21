@@ -203,7 +203,7 @@ var allMessageTypesTestData = []kik.Message{
 		SendMessage: kik.SendMessage{
 			To:        testUserName,
 			Type:      "video",
-			Delay:     1,
+			Delay:     500,
 			Keyboards: allKeyboardTypesTestData,
 		},
 		VideoUrl: "https://media.tenor.com/videos/a912c20be335cfd78610916c97198438/mp4",
