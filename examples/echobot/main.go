@@ -67,7 +67,7 @@ func handleMessages(c echo.Context) error {
 
 	kikClient.SendMessage(outgoingMessages)
 
-	return c.String(http.StatusOK, "Roll")
+	return c.String(http.StatusOK, "")
 }
 
 func respondTo(m []kik.Receive) []kik.Message {
@@ -96,13 +96,7 @@ func respondTo(m []kik.Receive) []kik.Message {
 			}
 
 		default:
-			reply = kik.TextMessage{
-				SendMessage: kik.SendMessage{
-					To:   "rmdkelly",
-					Type: "text",
-				},
-				Body: fmt.Sprintf("Unknown Message Type: %T", v),
-			}
+			fmt.Errorf("Was not able to decode message type %T", v)
 		}
 
 		outgoingMessages = append(outgoingMessages, reply)
