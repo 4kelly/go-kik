@@ -67,13 +67,19 @@ Messaging Types
 2. Receive (from users to the bot).
 
 */
-type Message interface {
-	marshalJSON() ([]byte, error)
+
+// Messages is a simple wrapper around a `Message` interface to satisfy the formatting for the Kik API payload.
+type Messages struct {
+	Messages []Message `json:"messages"`
 }
 
-func (t SendMessage) marshalJSON() ([]byte, error) {
-	return json.Marshal(t)
+// Message is a dummy interface so that all structs that embedd `Message` share a common interface.
+type Message interface {
+	message()
 }
+
+// Implement the dummy interface
+func (t SendMessage) message() { return }
 
 type SendMessage struct {
 	To        string                      `json:"to"`                  // The user or group that will receive the message
@@ -84,11 +90,57 @@ type SendMessage struct {
 	ChatId    string                      `json:"chatId,omitempty"`    // The identifier for the conversation your bot is involved in. This field is recommended for all responses in order for messages to be routed correctly (for example, if you're messaging a user in a group)
 }
 
+// ReceivedMessages is a simple wrapper around a `Receive` interface
+// that knows how to Unmarshal the JSON returned from the Kik API into a valid struct Type.
+type ReceivedMessages []Receive
+
+// UnmarshalJSON knows how to parse Kik bot API responses into their correct types.
+func (v *ReceivedMessages) UnmarshalJSON(data []byte) error {
+	// This just splits up the JSON array into the raw JSON for each object
+	var raw map[string][]json.RawMessage
+	err := json.Unmarshal(data, &raw)
+	if err != nil {
+		return err
+	}
+
+	messages := raw["messages"]
+	for _, r := range messages {
+		// unamrshal into a map to check the "type" field
+		var obj map[string]interface{}
+		err := json.Unmarshal(r, &obj)
+		if err != nil {
+			return err
+		}
+
+		messageType := ""
+		if t, ok := obj["type"].(string); ok {
+			messageType = t
+		}
+
+		// unmarshal again into the correct type
+		var actual Receive
+		switch messageType {
+		case "text":
+			actual = &TextMessageReceive{}
+		case "picture":
+			actual = &PictureMessageReceive{}
+		}
+
+		err = json.Unmarshal(r, actual)
+		if err != nil {
+			return err
+		}
+		*v = append(*v, actual)
+	}
+	return nil
+}
+
+// Receive is a dummy interface so that all structs that embedd `Receive` share a common interface.
 type Receive interface {
 	receive()
 }
 
-// Implements dummy interface method `receive` such that all received messages share a common interface.
+// Implements dummy interface.
 func (t ReceiveMessage) receive() { return }
 
 type ReceiveMessage struct {
@@ -213,64 +265,3 @@ Error Types
 
 var NotMessageTypeError = errors.New("not a valid message type")
 var HttpError = errors.New("HTTP request did not return 200")
-
-/*
-Notes
-*/
-
-// Response would be a useful abstraction if this struct is larger or was used independently.
-// Instead just embed the raw types for each response.
-//type Response struct {
-//	Type     string `json:"type"`
-//	Metadata string `json:"metadata,omitempty"`
-//}
-
-// Keyboard would be a useful abstraction if this struct is larger or was used independently.
-// Instead just embed the raw types for each keyboard.
-//type Keyboard struct {
-//	To     string `json:"to,omitempty"`     // defaults to everyone in the conversation.
-//	Hidden bool   `json:"hidden,omitempty"` // defaults to false.
-//	Type   string `json:"type"`
-//}
-type ReceivedMessages []Receive
-
-func (v *ReceivedMessages) UnmarshalJSON(data []byte) error {
-	// this just splits up the JSON array into the raw JSON for each object
-	var raw map[string][]json.RawMessage
-	err := json.Unmarshal(data, &raw)
-	if err != nil {
-		return err
-	}
-
-	messages := raw["messages"]
-	for _, r := range messages {
-		// unamrshal into a map to check the "type" field
-		var obj map[string]interface{}
-		err := json.Unmarshal(r, &obj)
-		if err != nil {
-			return err
-		}
-
-		messageType := ""
-		if t, ok := obj["type"].(string); ok {
-			messageType = t
-		}
-
-		// unmarshal again into the correct type
-		var actual Receive
-		switch messageType {
-		case "text":
-			actual = &TextMessageReceive{}
-		case "picture":
-			actual = &PictureMessageReceive{}
-		}
-
-		err = json.Unmarshal(r, actual)
-		if err != nil {
-			return err
-		}
-		*v = append(*v, actual)
-
-	}
-	return nil
-}

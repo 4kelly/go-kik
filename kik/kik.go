@@ -81,10 +81,7 @@ func (k *Client) GetConfiguration() (*Configuration, error) {
 }
 
 func (k *Client) SendMessage(messages []Message) error {
-	type m struct {
-		Messages []Message `json:"messages"`
-	}
-	payload := m{Messages: messages}
+	payload := Messages{messages}
 
 	req, err := k.newRequest("POST", SendMessageUrl, payload)
 	if err != nil {
@@ -97,10 +94,7 @@ func (k *Client) SendMessage(messages []Message) error {
 }
 
 func (k *Client) BroadcastMessage(messages []Message) error {
-	type m struct {
-		Messages []Message `json:"messages"`
-	}
-	payload := m{Messages: messages}
+	payload := Messages{messages}
 
 	req, err := k.newRequest("POST", BroadcastUrl, payload)
 	if err != nil {
