@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/4kelly/go-kik/kik"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/r-kells/go-kik/kik"
 )
 
 var (
@@ -18,14 +18,15 @@ var (
 )
 
 func init() {
-	username := os.Getenv("IT_KIKBOT_USERNAME")
-	key := os.Getenv("IT_KIKBOT_KEY")
+	username := os.Getenv("KIKBOT_USERNAME")
+	key := os.Getenv("KIKBOT_API_KEY")
+	webhook := os.Getenv("KIKBOT_WEBHOOK")
 
 	if username == "" {
-		log.Fatal("!!! No IT_KIKBOT_USERNAME set. Tests can't run !!!\n\n")
+		log.Fatal("!!! No KIKBOT_USERNAME set. Tests can't run !!!\n\n")
 	}
 	if key == "" {
-		log.Fatal("!!! No IT_KIKBOT_KEY set. Tests can't run !!!\n\n")
+		log.Fatal("!!! No KIKBOT_API_KEY set. Tests can't run !!!\n\n")
 	}
 
 	client := &http.Client{
@@ -44,6 +45,15 @@ func init() {
 	if err != nil {
 		log.Fatalf("could not initiate client: %v ", err)
 	}
+	config := kik.
+	err = kikClient.SetConfiguration(&kik.Configuration{
+		Webhook:        webhook,
+		Features:       &kik.Features{},
+		StaticKeyboard: nil,
+	})
+	if err != nil {
+		log.Fatalf("could not configure kik client: %v ", err)
+	}
 }
 
 func main() {
@@ -52,7 +62,7 @@ func main() {
 
 	e.POST("/incoming", handleMessages)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":5000"))
 }
 
 func handleMessages(c echo.Context) error {
@@ -65,7 +75,10 @@ func handleMessages(c echo.Context) error {
 
 	outgoingMessages := respondTo(messages)
 
-	kikClient.SendMessage(outgoingMessages)
+	err = kikClient.SendMessage(outgoingMessages)
+	if err != nil {
+		log.Printf("could not send message: %v ", err)
+	}
 
 	return c.String(http.StatusOK, "")
 }

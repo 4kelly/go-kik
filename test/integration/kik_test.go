@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/4kelly/go-kik/kik"
 	"github.com/google/go-cmp/cmp"
-	"github.com/r-kells/go-kik/kik"
 )
 
 var (

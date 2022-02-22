@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/4kelly/go-kik/kik"
+	"github.com/4kelly/go-kik/kiktest"
 	"github.com/google/go-cmp/cmp"
-	"github.com/r-kells/go-kik/kik"
-	"github.com/r-kells/go-kik/kiktest"
 )
 
 // User is an example kik username used for testing, it can be anything.

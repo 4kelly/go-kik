@@ -2,7 +2,7 @@
 package kiktest
 
 import (
-	"github.com/r-kells/go-kik/kik"
+	"github.com/4kelly/go-kik/kik"
 	"net/http"
 	"net/http/httptest"
 	"testing"

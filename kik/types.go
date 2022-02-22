@@ -227,6 +227,19 @@ type VideoMessageReceive struct {
 Configuration
 */
 
+//// NewConfiguration
+//func NewConfiguration(webhook string, features *Features, staticKeyboard *SuggestedResponseKeyboard) *Configuration {
+//
+//	if (Features{} == *features) {
+//		features = &Features{}
+//	}
+//	return &Configuration{
+//		Webhook:        webhook,
+//		Features:       features,
+//		StaticKeyboard: StaticKeyboard,
+//	}
+//}
+
 type Configuration struct {
 	Webhook   string            `json:"webhook"` // A URL to a webhook to which calls will be made when users interact with your bot.
 	*Features `json:"features"` // An object describing the features that are active or not active for your bot.
