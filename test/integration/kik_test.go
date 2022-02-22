@@ -22,14 +22,18 @@ var (
 )
 
 func init() {
-	username := os.Getenv("IT_KIKBOT_USERNAME")
-	key := os.Getenv("IT_KIKBOT_KEY")
+	username := os.Getenv("KIKBOT_USERNAME")
+	key := os.Getenv("KIKBOT_API_KEY")
+	webhook := os.Getenv("KIKBOT_WEBHOOK")
 
 	if username == "" {
-		log.Fatal("!!! No IT_KIKBOT_USERNAME set. Tests can't run !!!\n\n")
+		log.Fatal("!!! No KIKBOT_USERNAME set. Tests can't run !!!\n\n")
 	}
 	if key == "" {
-		log.Fatal("!!! No IT_KIKBOT_KEY set. Tests can't run !!!\n\n")
+		log.Fatal("!!! No KIKBOT_API_KEY set. Tests can't run !!!\n\n")
+	}
+	if webhook == "" {
+		log.Fatal("!!! No KIKBOT_WEBHOOK set. Tests can't run !!!\n\n")
 	}
 
 	client := &http.Client{
@@ -47,6 +51,15 @@ func init() {
 	)
 	if err != nil {
 		log.Fatalf("could not initiate client: %v ", err)
+	}
+
+	err = kikClient.SetConfiguration(&kik.Configuration{
+		Webhook:        webhook,
+		Features:       kik.Features{},
+		StaticKeyboard: nil,
+	})
+	if err != nil {
+		log.Fatalf("could not configure kik client: %v ", err)
 	}
 }
 
@@ -86,13 +99,8 @@ func TestConfig_HappyPath(t *testing.T) {
 		},
 	}
 	wantConfig := &kik.Configuration{
-		Webhook: "http://example.com",
-		Features: &kik.Features{
-			ManuallySendReadReceipts: false,
-			ReceiveReadReceipts:      false,
-			ReceiveDeliveryReceipts:  false,
-			ReceiveIsTyping:          false,
-		},
+		Webhook:        "http://example.com",
+		Features:       kik.Features{},
 		StaticKeyboard: keyboard,
 	}
 	err := kikClient.SetConfiguration(wantConfig)
