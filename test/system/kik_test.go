@@ -1,19 +1,17 @@
-// Package integration runs tests against the real Kik API.
+// Package system runs tests against the real Kik API.
 // Generally they will only fail if there is an error in the payloads being sent.
 // This is useful to verify the Kik API hasn't introduced breaking request / response types.
-package integration
+package system
 
 import (
 	"fmt"
+	"github.com/4kelly/go-kik/kik"
+	"github.com/google/go-cmp/cmp"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"testing"
-	"time"
-
-	"github.com/4kelly/go-kik/kik"
-	"github.com/google/go-cmp/cmp"
 )
 
 var (
@@ -36,19 +34,7 @@ func init() {
 		log.Fatal("!!! No KIKBOT_WEBHOOK set. Tests can't run !!!\n\n")
 	}
 
-	client := &http.Client{
-		Transport:     nil,
-		CheckRedirect: nil,
-		Jar:           nil,
-		Timeout:       time.Duration(3) * time.Second,
-	}
-
-	kikClient, err = kik.NewKikClient(
-		"https://api.kik.com/",
-		username,
-		key,
-		client,
-	)
+	kikClient, err = kik.NewKikClient("https://api.kik.com/", username, key, nil)
 	if err != nil {
 		log.Fatalf("could not initiate client: %v ", err)
 	}
